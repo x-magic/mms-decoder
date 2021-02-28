@@ -22,12 +22,11 @@
  * Francisco, CA 94107 USA. 
  */
 
-
 if (!defined("DEBUG"))
-   define( "DEBUG", 0 );	/* Print parseerrors? Print values while they are parsed? If you enable this, 
-	   	    		   getting the binary encoded confirmation message whensending MMS from mobiles 
-				   will not work. This is only for development purpose. */
-
+	define( "DEBUG", 0 );
+/* Print parseerrors? Print values while they are parsed? If you enable this, 
+   getting the binary encoded confirmation message whensending MMS from mobiles 
+   will not work. This is only for development purpose. */
 
 /*---------------------------------------------------*
  * Constants                                         *
@@ -44,33 +43,33 @@ if (!defined("DEBUG"))
  * 7Bit 0D =  0001101                                *
  * 8Bit 0D = 10001101 = 8D                           *
  *---------------------------------------------------*/
-define( "BCC",			0x81 );
-define( "CC",			0x82 );
-define( "CONTENT_LOCATION",	0x83 );
-define( "CONTENT_TYPE",		0x84 );
-define( "DATE",			0x85 );
-define( "DELIVERY_REPORT",	0x86 );
-define( "DELIVERY_TIME",	0x87 );
-define( "EXPIRY",		0x88 );
-define( "FROM",			0x89 );
-define( "MESSAGE_CLASS",	0x8A );
-define( "MESSAGE_ID",		0x8B );
-define( "MESSAGE_TYPE",		0x8C );
-define( "MMS_VERSION",		0x8D );
-define( "MESSAGE_SIZE",		0x8E );
-define( "PRIORITY",		0x8F );
-define( "READ_REPLY",		0x90 );
-define( "REPORT_ALLOWED",	0x91 );
-define( "RESPONSE_STATUS",	0x92 );
-define( "RESPONSE_TEXT",	0x93 );
-define( "SENDER_VISIBILITY",	0x94 );
-define( "STATUS",		0x95 );
-define( "SUBJECT",		0x96 );
-define( "TO",			0x97 );
-define( "TRANSACTION_ID",	0x98 );
+define( "BCC",						0x81 );
+define( "CC",						0x82 );
+define( "CONTENT_LOCATION",			0x83 );
+define( "CONTENT_TYPE",				0x84 );
+define( "DATE",						0x85 );
+define( "DELIVERY_REPORT",			0x86 );
+define( "DELIVERY_TIME",				0x87 );
+define( "EXPIRY",					0x88 );
+define( "FROM",						0x89 );
+define( "MESSAGE_CLASS",				0x8A );
+define( "MESSAGE_ID",				0x8B );
+define( "MESSAGE_TYPE",				0x8C );
+define( "MMS_VERSION",				0x8D );
+define( "MESSAGE_SIZE",				0x8E );
+define( "PRIORITY",					0x8F );
+define( "READ_REPLY",				0x90 );
+define( "REPORT_ALLOWED",				0x91 );
+define( "RESPONSE_STATUS",			0x92 );
+define( "RESPONSE_TEXT",				0x93 );
+define( "SENDER_VISIBILITY",			0x94 );
+define( "STATUS",					0x95 );
+define( "SUBJECT",					0x96 );
+define( "TO",						0x97 );
+define( "TRANSACTION_ID",				0x98 );
 
-define( "FROM_ADDRESS_PRESENT_TOKEN", 0x80);
-define( "FROM_INSERT_ADDRESS_TOKEN",  0x81);
+define( "FROM_ADDRESS_PRESENT_TOKEN",	0x80 );
+define( "FROM_INSERT_ADDRESS_TOKEN",	0x81 );
 
 
 /*--------------------------*
@@ -191,11 +190,11 @@ $mmsContentTypes = array(
 
 // character set (mibenum numbers by IANA, ored with 0x80)
 $mmsCharSet = array(0xEA => 'utf-8',
-		    0x83 => 'ASCII', // ascii
-		    0x84 => 'iso-8859-1',
-		    0x85 => 'iso-8859-2',
-		    0x86 => 'iso-8859-3',
-		    0x87 => 'iso-8859-4');
+			0x83 => 'ASCII', // ascii
+			0x84 => 'iso-8859-1',
+			0x85 => 'iso-8859-2',
+			0x86 => 'iso-8859-3',
+			0x87 => 'iso-8859-4');
 
 
 /*-------------------------------*
@@ -239,7 +238,7 @@ class MMSDecoder {
 	
 	
 	// Constructor
-	function MMSDecoder($data) {
+	function __construct($data) {
 		$this->data = array();
 		
 		// Save the data in an array containing the ascii numbers
@@ -552,15 +551,15 @@ class MMSDecoder {
 		$len = $this->parseValueLength();
 		
 		if ($this->data[$this->pos] == FROM_ADDRESS_PRESENT_TOKEN) {
-		   	if (DEBUG) $this->debug("parseFromValue", "Address-present-token found", $this->pos);
-		   	$this->pos++;
+			if (DEBUG) $this->debug("parseFromValue", "Address-present-token found", $this->pos);
+			$this->pos++;
 			return $this->parseEncodedStringValue();
 		} else if ($this->data[$this->pos] == FROM_INSERT_ADDRESS_TOKEN) {
-		        if (DEBUG) $this->debug("parseFromValue", "Insert-address-token found", $this->pos);
-		       	$this->pos++;
-		        return "";
+				if (DEBUG) $this->debug("parseFromValue", "Insert-address-token found", $this->pos);
+				$this->pos++;
+				return "";
 		} else {
-		        // something is wrong since none of the tokens are present, try to skip this field
+				// something is wrong since none of the tokens are present, try to skip this field
 			if (DEBUG) $this->debug("parseFromValue", "No from token found, trying to skip the value field by jumping " . $len . " bytes", $this->pos);
 			$this->pos += $len;
 		}
@@ -624,7 +623,7 @@ class MMSDecoder {
 			// the only case we can handle currently is utf8 since character encoding support
 			// in native PHP is so lousy
 			if ($charset == 'utf-8')
-			    $raw = utf8_decode($raw);
+				$raw = utf8_decode($raw);
 			
 			return $raw;
 			
@@ -667,9 +666,10 @@ class MMSDecoder {
 		$octetcount = $this->data[$this->pos++];
 		
 		// Error checking
-		if ($octetcount > 30)
-			die("Parse error: Short-length-octet (" . $this->data[$this->pos-1] . ") > 30 in Long-integer at offset " . $this->pos-1 . "!\n");
-		
+		if ($octetcount > 30) {
+			$data_pos = $this->pos - 1;
+			die("Parse error: Short-length-octet ($data_pos) > 30 in Long-integer at offset $data_pos!\n");
+		}
 		// Get the long-integer
 		$longint = 0;
 		for ($i = 0; $i < $octetcount; $i++) {
@@ -781,12 +781,14 @@ class MMSDecoder {
 	 * Function which outputs debug messages *
 	 *---------------------------------------*/
 	function debug($name, $str, $pos = -1, $errorlevel = 0) {
-		if ($pos != -1)
-			echo "<b>$name ($pos):</b> " . $str;
-		else
-			echo "<b>$name:</b> " . $str;
-		
-		echo "<br>\n";
+		if (DEBUG) {
+			if ($pos != -1)
+				echo "<b>$name ($pos):</b> " . $str;
+			else
+				echo "<b>$name:</b> " . $str;
+			
+			echo "<br>\n";
+		}
 		
 		if ($errorlevel > 0)
 			exit;
@@ -857,7 +859,7 @@ class MMSPart {
 	/*----------------------------------*
 	 * Constructor, just store the data *
 	 *----------------------------------*/
-	function MMSPart($headerlen, $datalen, $ctype, $header, $data) {
+	function __construct($headerlen, $datalen, $ctype, $header, $data) {
 		$this->hpos = 0;
 		$this->headerlen = $headerlen;
 		$this->DATALEN = $datalen;
